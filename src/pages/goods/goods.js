@@ -10,6 +10,7 @@ import axios from 'axios'
 import url from 'js/api.js'
 import qs from 'qs'
 import mixin from 'js/mixin.js'
+import Swiper from 'components/Swiper'
 
 let {id} = qs.parse(location.search.substring(1))
 
@@ -19,10 +20,14 @@ new Vue({
     details: null,
     detailTab: ['商品详情', '本店成交'],
     tabIndex: 0,
-    dealData: null
+    dealData: null,
+    bannerLists: [],
   },
   created() {
     this.getDetails()
+  },
+  components: {
+    Swiper
   },
   methods: {
     getDetails() {
@@ -30,6 +35,12 @@ new Vue({
         id
       }).then((res) => {
         this.details = res.data.data
+        this.details.imgs.forEach((img) => {
+          this.bannerLists.push({
+            clickUrl: '#',
+            img: img
+          })
+        })
       })
     },
     changeTab(index) {
