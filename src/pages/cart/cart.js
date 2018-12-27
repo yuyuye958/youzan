@@ -5,4 +5,82 @@ import './cart.css'
 import Vue from 'vue'
 import axios from 'axios'
 import url from 'js/api.js'
-import Foot from 'components/Foot'
+import mixin from 'js/mixin.js'
+
+new Vue({
+  el: '.container',
+  data: {
+    lists: null,
+    totalPrice: 0
+  },
+  created() {
+    this.getLists()
+  },
+  computed: {
+    allChecked: {
+      get() {
+        if (this.lists && this.lists.length) {
+          return this.lists.every((shop) => {
+            return shop.checked
+          })
+        }
+        return false
+      },
+      set(newVal) {
+        this.lists.forEach((shop) => {
+          shop.checked = newVal
+          shop.goodsList.forEach((goods) => {
+            goods.checked = newVal
+          })
+        })
+      }
+    },
+    selectLists() {
+      if (this.lists && this.lists.length) {
+        let array = []
+        let totalPrice = 0
+        this.lists.forEach((shop) => {
+          shop.goodsList.forEach((goods) => {
+            if (goods.checked) {
+              array.push(goods)
+              totalPrice += goods.price * goods.number
+            }
+          })
+        })
+        this.totalPrice = totalPrice
+        return array
+      }
+      return []
+    }
+  },
+  methods: {
+    getLists() {
+      axios.get(url.cartList).then((res) => {
+        let lists = res.data.cartList
+        lists.forEach((shop) => {
+          shop.checked = true
+          shop.goodsList.forEach((goods) => {
+            goods.checked = true
+          })
+        })
+        this.lists = lists
+      })
+    },
+    selectGoods(shop, goods) {
+      goods.checked = !goods.checked
+      shop.checked = shop.goodsList.every((goods) => {
+        return goods.checked
+      })
+    },
+    selectShop(shop) {
+      shop.checked = !shop.checked
+      shop.goodsList.forEach((goods) => {
+        goods.checked = shop.checked
+      })
+    },
+    selectAll() {
+      this.allChecked = !this.allChecked
+    }
+  },
+  mixins: [mixin]
+})

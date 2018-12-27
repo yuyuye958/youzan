@@ -7,7 +7,11 @@ let url = {
   search: '/search/list',
   goods: '/goods/details',
   deal: '/goods/deal',
-  addCart: '/cart/add'
+  addCart: '/cart/add',
+  cartList: '/cart/list',
+  cartReduce: '/cart/reduce',
+  cartRemove: '/cart/remove',
+  cartMremove: '/cart/mremove'
 }
 
 // 开发环境和真实环境的切换
@@ -15,7 +19,7 @@ let url = {
 let host = 'http://rap2api.taobao.org/app/mock/7058'
 
 for (let key in url) {
-  if (url.hasOwnProperty(key)){
+  if (url.hasOwnProperty(key)) {
     url[key] = host + url[key]
   }
 }
