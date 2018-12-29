@@ -11,7 +11,9 @@ new Vue({
   el: '.container',
   data: {
     lists: null,
-    totalPrice: 0
+    totalPrice: 0,
+    editingShop: null,
+    editingShopIndex: -1,
   },
   created() {
     this.getLists()
@@ -20,6 +22,7 @@ new Vue({
     allChecked: {
       get() {
         if (this.lists && this.lists.length) {
+          // 遍历数组，如果每一个店铺都选中那么全选就是选中
           return this.lists.every((shop) => {
             return shop.checked
           })
@@ -33,6 +36,25 @@ new Vue({
             goods.checked = newVal
           })
         })
+      }
+    },
+    allRemoveChecked: {
+      get() {
+        // 如果是编辑状态 this.editingShop就是当前shop
+        if (this.editingShop) {
+          return this.editingShop.removeChecked
+        }
+        return false
+      },
+      set(newVal) {
+        if (this.editingShop) {
+          // 可编辑状态下，店铺的选中值是newVal
+          this.editingShop.removeChecked = newVal
+          // 可编辑状态下，店铺全部商品的选中值都是newVal
+          this.editingShop.goodsList.forEach((goods) => {
+            goods.removeChecked = newVal
+          })
+        }
       }
     },
     selectLists() {
@@ -51,6 +73,18 @@ new Vue({
         return array
       }
       return []
+    },
+    removeLists() {
+      if (this.editingShop) {
+        let array = []
+        this.editingShop.goodsList.forEach((goods)=>{
+          if (goods.removeChecked){
+            array.push(goods)
+          }
+        })
+        return array
+      }
+      return []
     }
   },
   methods: {
@@ -59,27 +93,46 @@ new Vue({
         let lists = res.data.cartList
         lists.forEach((shop) => {
           shop.checked = true
+          shop.removeChecked = false
+          shop.editing = false
+          shop.editingMsg = '编辑'
           shop.goodsList.forEach((goods) => {
             goods.checked = true
+            goods.removeChecked = false
           })
         })
         this.lists = lists
       })
     },
     selectGoods(shop, goods) {
-      goods.checked = !goods.checked
-      shop.checked = shop.goodsList.every((goods) => {
-        return goods.checked
+      let attr = this.editingShop ? 'removeChecked' : 'checked'
+      goods[attr] = !goods[attr]
+      shop[attr] = shop.goodsList.every((goods) => {
+        return goods[attr]
       })
     },
     selectShop(shop) {
-      shop.checked = !shop.checked
+      let attr = this.editingShop ? 'removeChecked' : 'checked'
+      shop[attr] = !shop[attr]
       shop.goodsList.forEach((goods) => {
-        goods.checked = shop.checked
+        goods[attr] = shop[attr]
       })
     },
     selectAll() {
-      this.allChecked = !this.allChecked
+      let attr = this.editingShop ? 'allRemoveChecked' : 'allChecked'
+      this[attr] = !this[attr]
+    },
+    edit(shop, shopIndex) {
+      shop.editing = !shop.editing
+      shop.editingMsg = shop.editing ? '完成' : '编辑'
+      this.lists.forEach((item, index) => {
+        if (shopIndex !== index) {
+          item.editing = false
+          item.editingMsg = shop.editing ? '' : '编辑'
+        }
+      })
+      this.editingShop = shop.editing ? shop : null
+      this.editingShopIndex = shop.editing ? shopIndex : -1
     }
   },
   mixins: [mixin]
