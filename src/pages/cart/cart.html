@@ -75,19 +75,19 @@
                           <div class="num" v-show="shop.editing">
                             <!---->
                             <div class="quantity">
-                              <button type="button" class="minus disabled"></button>
+                              <button type="button" class="minus" :class="{disabled: goods.number === 1}"></button>
                               <input type="text" pattern="[0-9]*" class="txt" v-model="goods.number">
                               <button type="button" class="plus "></button>
-                              <div class="response-area response-area-minus"></div>
-                              <div class="response-area response-area-plus"></div>
+                              <div class="response-area response-area-minus" @click="reduce(goods)"></div>
+                              <div class="response-area response-area-plus" @click="add(goods)"></div>
                             </div>
                           </div>
                           <div class="price c-orange">
-                            ¥<span>{{goods.price | formarPrice}} </span></div>
+                            ¥<span>{{goods.price | formatPrice}} </span></div>
                         </div>
                         <div class="error-box"></div>
                       </div>
-                      <div class="delete-btn"><span>删除</span></div>
+                      <div class="delete-btn" @click="remove(shop,shopIndex,goods,goodsIndex)"><span>删除</span></div>
                     </div>
                   </li>
                 </ul>
@@ -141,24 +141,40 @@
                 合计：¥<span class="js-total-price" style="color: rgb(255, 102, 0);">{{totalPrice | formatPrice}}</span>
                 <p class="c-gray-dark">不含运费</p>
               </div>
-              <button href="javascript:;" :disabled="!selectLists.length" class="js-go-pay btn btn-orange-dark font-size-14" v-show="!editingShop">
+              <button href="javascript:;" :disabled="!selectLists.length" class="js-go-pay btn btn-orange-dark font-size-14"
+                      v-show="!editingShop">
                 结算 (3)
               </button>
               <!-- 编辑状态 -->
-              <button href="javascript:;" :disabled="!removeLists.length" class="j-delete-goods btn font-size-14 btn-red" v-show="editingShop">删除
+              <button href="javascript:;" :disabled="!removeLists.length" class="j-delete-goods btn font-size-14 btn-red"
+                      v-show="editingShop"
+                      @click="removeList()">删除
                     </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="footer" style="min-height: 86px;">
-    <div class="copyright">
-      <div class="ft-copyright " style="background-image: url(https://img.yzcdn.cn/upload_files/2016/11/15/147918630760182374.png);">
-        <a class="yz-logo" href="https://www.youzan.com/?from_source=support_logo">有赞提供技术支持</a> </div>
+    <div id="hEQD1ZYb2p" v-show="removePopup" style="height: 100%; position: fixed; top:0px;left:0px;right: 0px; background: rgba(0,0,0,.7);z-index:100; transition: none .2s ease; opacity: 1"></div>
+    <div id="RKinAL9BX5" v-show="removePopup" class="popout-confirm popout-box" style="overflow: hidden; position: absolute; z-index: 1000; transition: opacity 300ms ease; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0px); visibility: visible; border-radius: 4px; background: white; width: 270px; padding: 15px; opacity: 1;">
+      <div class="confrim-content font-size-14" style="line-height: 20px; padding: 5px 5px 10px;">
+        {{removeMsg}}
+      </div>
+      <hr style="margin: 9px -15px 10px;">
+      <div class="btn-2-1" @click="removePopup=false">
+        <p class="js-cancel center font-size-16" style="padding-top: 5px;">取消</p>
+      </div>
+      <div class="btn-2-1" @click="removeConfirm">
+        <p class="js-ok center c-green font-size-16" style="padding-top: 5px;">确定</p>
+      </div>
     </div>
   </div>
+  <!--<div class="footer" style="min-height: 86px;">-->
+    <!--<div class="copyright">-->
+      <!--<div class="ft-copyright " style="background-image: url(https://img.yzcdn.cn/upload_files/2016/11/15/147918630760182374.png);">-->
+        <!--<a class="yz-logo" href="https://www.youzan.com/?from_source=support_logo">有赞提供技术支持</a> </div>-->
+    <!--</div>-->
+  <!--</div>-->
 </body>
 
 </html>

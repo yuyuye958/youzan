@@ -14,6 +14,9 @@ new Vue({
     totalPrice: 0,
     editingShop: null,
     editingShopIndex: -1,
+    removePopup: false,
+    removeData: null,
+    removeMsg: null
   },
   created() {
     this.getLists()
@@ -77,8 +80,8 @@ new Vue({
     removeLists() {
       if (this.editingShop) {
         let array = []
-        this.editingShop.goodsList.forEach((goods)=>{
-          if (goods.removeChecked){
+        this.editingShop.goodsList.forEach((goods) => {
+          if (goods.removeChecked) {
             array.push(goods)
           }
         })
@@ -133,6 +136,87 @@ new Vue({
       })
       this.editingShop = shop.editing ? shop : null
       this.editingShopIndex = shop.editing ? shopIndex : -1
+    },
+    reduce(goods) {
+      if (goods.number === 1) {
+        return
+      }
+      axios.post(url.cartReduce, {
+        id: goods.id,
+        number: 1
+      }).then((res) => {
+        goods.number--
+      })
+    },
+    add(goods) {
+      axios.post(url.cartAdd, {
+        id: goods.id,
+        number: 1
+      }).then((res) => {
+        goods.number++
+      })
+    },
+    remove(shop, shopIndex, goods, goodsIndex) {
+      this.removePopup = true
+      this.removeData = {shop, shopIndex, goods, goodsIndex}
+      this.removeMsg = '确定要删除该商品吗？'
+    },
+    removeList() {
+      this.removePopup = true
+      this.removeMsg = `确定将所选的 ${this.removeLists.length} 个商品删除吗？`
+    },
+    removeConfirm() {
+      // 删除单个商品
+      if (this.removeMsg === `确定要删除该商品吗？`) {
+        let {shop, shopIndex, goods, goodsIndex} = this.removeData
+        axios.post(url.cartRemove, {
+          id: goods.id
+        }).then((res) => {
+          shop.goodsList.splice(goodsIndex, 1)
+          // 如果删的是最后一件商品了
+          if (!shop.goodsList.length) {
+            this.lists.splice(shopIndex, 1)
+            this.removeShop()
+          }
+          this.removePopup = false
+        })
+      } else {
+        // 删除多个商品
+        let ids = []
+        this.removeLists.forEach((goods) => {
+          ids.push(goods.id)
+        })
+        axios.post(url.cartMremove, {
+          ids
+        }).then((res) => {
+          let array = []
+          this.editingShop.goodsList.forEach((goods) => {
+            // findIndex() 方法返回传入一个测试条件（函数）符合条件的数组第一个元素位置。如果没有符合条件的元素返回 -1
+            let index = this.removeLists.findIndex((item) => {
+              return item.id === goods.id
+            })
+            if (index === -1) {
+              array.push(goods)
+            }
+          })
+          if (array.length) {
+            this.editingShop.goodsList = array
+          } else {
+            // 如果该店铺商品都删了
+            this.lists.splice(this.editingShopIndex, 1)
+            this.removeShop()
+          }
+          this.removePopup = false
+        })
+      }
+    },
+    removeShop() {
+      this.editingShop = null
+      this.editingShopIndex = -1
+      this.lists.forEach((shop) => {
+        shop.editing = false
+        shop.editingMsg = '编辑'
+      })
     }
   },
   mixins: [mixin]
