@@ -6,6 +6,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import url from 'js/api.js'
 import mixin from 'js/mixin.js'
+import Velocity from 'velocity-animate'
 
 new Vue({
   el: '.container',
@@ -216,6 +217,22 @@ new Vue({
       this.lists.forEach((shop) => {
         shop.editing = false
         shop.editingMsg = '编辑'
+      })
+    },
+    touchStart(e, goods) {
+      goods.startX = e.changedTouches[0].clientX
+    },
+    touchEnd(e, shopIndex, goods, goodsIndex) {
+      let endX = e.changedTouches[0].clientX
+      let left = '0'
+      if (goods.startX - endX > 100) {
+        left = '-60px'
+      }
+      if (endX - goods.startX > 100) {
+        left = '0px'
+      }
+      Velocity(this.$refs[`goods-${shopIndex}-${goodsIndex}`], {
+        left
       })
     }
   },
