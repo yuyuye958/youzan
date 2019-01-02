@@ -50,6 +50,7 @@
                   <li class="block-item block-item-cart" :class="{editing: shop.editing}"
                       :ref="'goods-' + shopIndex + '-' + goodsIndex"
                       v-for="(goods, goodsIndex) in shop.goodsList"
+                      :key="goods.id"
                       @touchstart="touchStart($event, goods)"
                       @touchend="touchEnd($event,shopIndex,goods,goodsIndex)">
                     <div>
