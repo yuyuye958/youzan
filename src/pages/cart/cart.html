@@ -50,7 +50,6 @@
                   <li class="block-item block-item-cart" :class="{editing: shop.editing}"
                       :ref="'goods-' + shopIndex + '-' + goodsIndex"
                       v-for="(goods, goodsIndex) in shop.goodsList"
-                      :key="goods.id"
                       @touchstart="touchStart($event, goods)"
                       @touchend="touchEnd($event,shopIndex,goods,goodsIndex)">
                     <div>
@@ -148,7 +147,7 @@
               </div>
               <button href="javascript:;" :disabled="!selectLists.length" class="js-go-pay btn btn-orange-dark font-size-14"
                       v-show="!editingShop">
-                结算 (3)
+                结算 ({{selectLists.length}})
               </button>
               <!-- 编辑状态 -->
               <button href="javascript:;" :disabled="!removeLists.length" class="j-delete-goods btn font-size-14 btn-red"
