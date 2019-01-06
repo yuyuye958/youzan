@@ -8,10 +8,15 @@ let url = {
   goods: '/goods/details',
   deal: '/goods/deal',
   cartAdd: '/cart/add',
-  cartList: '/cart/list',
   cartReduce: '/cart/reduce',
+  cartList: '/cart/list',
   cartRemove: '/cart/remove',
-  cartMremove: '/cart/mremove'
+  cartMremove: '/cart/mremove',
+  addressList: '/address/list',
+  addressAdd: '/address/add',
+  addressRemove: '/address/remove',
+  addressUpdate: '/address/update',
+  addressSetDefault: '/address/setDefault',
 }
 
 // 开发环境和真实环境的切换
