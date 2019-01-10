@@ -16,15 +16,19 @@
           <div class="select-group">
             <select class="js-province-selector" v-model="provinceValue">
               <option value="-1">选择省份</option>
-              <option :value="province.value" v-for="province in addressData.list">{{province.label}}</option>
+              <option :value="province.value" v-for="province in addressData.list" :key="province.value">
+                {{province.label}}
+              </option>
             </select>
             <select class="js-city-selector" v-model="cityValue">
               <option value="-1">选择城市</option>
-              <option :value="city.value" v-for="city in cityList">{{city.label}}</option>
+              <option :value="city.value" v-for="city in cityList" :key="city.value">{{city.label}}</option>
             </select>
             <select class="js-county-selector" name="area_code" data-code="" v-model="districtValue">
               <option value="-1">选择地区</option>
-              <option :value="district.value" v-for="district in districtList">{{district.label}}</option>
+              <option :value="district.value" v-for="district in districtList" :key="district.value">
+                {{district.label}}
+              </option>
             </select>
           </div>
         </div>
@@ -47,6 +51,7 @@
 </template>
 <script>
   import Address from 'js/addressService.js'
+  import {mapState} from 'vuex'
 
   export default {
     data() {
@@ -83,6 +88,12 @@
         return this.$store.state.lists
       }
     },
+    // computed: {
+    //   ...mapState({
+    //     lists: state => state.lists
+    //   })
+    // },
+    // computed: mapState['lists'],
     watch: {
       lists: {
         // 一旦lists发生改变就往前跳转页面
@@ -106,6 +117,10 @@
 
         if (this.type === 'edit') {
           this.cityValue = parseInt(this.instance.cityValue)
+          if (value !== parseInt(this.instance.provinceValue)) {
+            this.cityValue = -1
+            this.districtValue = -1
+          }
         }
       },
       cityValue(value) {
@@ -121,6 +136,9 @@
 
         if (this.type === 'edit') {
           this.districtValue = parseInt(this.instance.districtValue)
+          if (value !== parseInt(this.instance.cityValue)) {
+            this.districtValue = -1
+          }
         }
       }
     },
